@@ -1,18 +1,16 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Mail, Copy, RefreshCw, Check } from "lucide-react";
+import { Mail, Copy, Check } from "lucide-react";
 
 interface EmailOutputProps {
   email: string;
   isLoading: boolean;
-  onRegenerate: () => void;
 }
 
 export default function EmailOutput({
   email,
   isLoading,
-  onRegenerate,
 }: EmailOutputProps) {
   const [copied, setCopied] = useState(false);
 
@@ -61,16 +59,6 @@ export default function EmailOutput({
                   Copy Email
                 </>
               )}
-            </button>
-            <button
-              onClick={onRegenerate}
-              disabled={isLoading}
-              className="py-3 px-4 border border-gray-200 hover:bg-gray-50 disabled:opacity-50 text-gray-700 font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              <RefreshCw
-                className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
-              />
-              Regenerate
             </button>
           </div>
         </>

@@ -25,7 +25,6 @@ console.log(`
 ║   • POST /api/parse-resume - Parse PDF/DOCX resume        ║
 ║   • POST /api/generate     - Start email generation       ║
 ║   • GET  /api/stream/:id   - SSE stream for updates       ║
-║   • POST /api/regenerate/:id - Regenerate with cache      ║
 ║   • POST /api/fetch-jd     - Fetch JD from URL            ║
 ║                                                           ║
 ╚═══════════════════════════════════════════════════════════╝

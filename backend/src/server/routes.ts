@@ -7,14 +7,10 @@ import {
   generateJobId,
   createJob,
   getJob,
-  updateJobResult,
-  getCachedInsights,
 } from "../utils/research-cache.ts";
 import {
   createColdReachAgent,
   generateEmailStream,
-  regenerateEmailStream,
-  type ColdReachResult,
   type ZypherAgent,
 } from "../agent/coldreach-agent.ts";
 
@@ -211,11 +207,6 @@ app.get("/api/stream/:jobId", async (c) => {
           data: JSON.stringify(event),
           event: "message",
         });
-
-        // Cache the result when complete
-        if (event.type === "complete" && typeof event.data === "object") {
-          updateJobResult(jobId, event.data as ColdReachResult);
-        }
       }
 
       // Send done event
@@ -229,65 +220,6 @@ app.get("/api/stream/:jobId", async (c) => {
         data: JSON.stringify({
           type: "error",
           data: error instanceof Error ? error.message : "Stream error",
-        }),
-        event: "message",
-      });
-    }
-  });
-});
-
-// Regenerate email with cached research
-app.post("/api/regenerate/:jobId", async (c) => {
-  const jobId = c.req.param("jobId");
-  const job = getJob(jobId);
-
-  if (!job) {
-    return c.json({ error: "Job not found or expired" }, 404);
-  }
-
-  const insights = getCachedInsights(jobId);
-  if (!insights) {
-    return c.json(
-      { error: "No cached insights found. Please generate a new email." },
-      400
-    );
-  }
-
-  return streamSSE(c, async (stream) => {
-    try {
-      const agent = await getAgent();
-
-      await stream.writeSSE({
-        data: JSON.stringify({ type: "connected", jobId }),
-        event: "message",
-      });
-
-      for await (const event of regenerateEmailStream(
-        agent,
-        job.resumeText,
-        job.jdText,
-        insights
-      )) {
-        await stream.writeSSE({
-          data: JSON.stringify(event),
-          event: "message",
-        });
-
-        if (event.type === "complete" && typeof event.data === "object") {
-          updateJobResult(jobId, event.data as ColdReachResult);
-        }
-      }
-
-      await stream.writeSSE({
-        data: JSON.stringify({ type: "done" }),
-        event: "message",
-      });
-    } catch (error) {
-      console.error("Regenerate error:", error);
-      await stream.writeSSE({
-        data: JSON.stringify({
-          type: "error",
-          data: error instanceof Error ? error.message : "Regeneration error",
         }),
         event: "message",
       });
@@ -327,7 +259,7 @@ Return ONLY the job description text, nothing else. If you can't find a job desc
 
           for await (const event of eachValueFrom(event$)) {
             if (event.type === "text") {
-              fullText += event.content.text || "";
+              fullText += event.content as string;
             }
           }
 

@@ -3,7 +3,6 @@ import { eachValueFrom } from "rxjs-for-await";
 import {
   COLDREACH_SYSTEM_PROMPT,
   buildGenerationPrompt,
-  buildRegeneratePrompt,
 } from "./prompts.ts";
 
 // Re-export ZypherAgent type for use in other modules
@@ -216,47 +215,3 @@ export async function* generateEmailStream(
   }
 }
 
-// Regenerate email with cached insights (no new research)
-export async function* regenerateEmailStream(
-  agent: ZypherAgent,
-  resumeText: string,
-  jdText: string,
-  previousInsights: ColdReachInsights
-): AsyncGenerator<StreamEvent> {
-  const prompt = buildRegeneratePrompt(resumeText, jdText, previousInsights);
-
-  yield { type: "status", data: "Regenerating email with cached research..." };
-
-  // Include system prompt in the task
-  const fullPrompt = `${COLDREACH_SYSTEM_PROMPT}\n\n${prompt}`;
-  // Use Claude Sonnet 4 for better tool usage and research quality
-  const event$ = agent.runTask(fullPrompt, "claude-sonnet-4-20250514");
-
-  let fullResponse = "";
-
-  for await (const event of eachValueFrom(event$)) {
-    if (event.type === "text") {
-      // For text events, content IS the text string directly
-      fullResponse += event.content as string;
-    }
-  }
-
-  // Parse the final response
-  try {
-    const jsonMatch = fullResponse.match(/```json\s*([\s\S]*?)\s*```/) ||
-      fullResponse.match(/({[\s\S]*})/);
-
-    if (jsonMatch && jsonMatch[1]) {
-      const result: ColdReachResult = JSON.parse(jsonMatch[1]);
-      yield { type: "email", data: result.email.body };
-      yield { type: "complete", data: result };
-    } else {
-      throw new Error("Could not parse agent response as JSON");
-    }
-  } catch (error) {
-    yield {
-      type: "error",
-      data: `Failed to parse response: ${error instanceof Error ? error.message : "Unknown error"}`,
-    };
-  }
-}

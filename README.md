@@ -8,7 +8,6 @@ AI-powered personalized cold email generator for job seekers targeting founders 
 - **Live Company Research**: Uses Firecrawl to research companies in real-time
 - **Real-time Streaming**: See research insights as they're discovered via SSE
 - **Personalized Emails**: 120-150 word emails grounded in actual research
-- **Regenerate**: Generate new variations without re-researching
 - **Research Depth Control**: From quick (1-2 sources) to deep (5+ sources)
 
 ## Architecture
@@ -115,7 +114,6 @@ Open http://localhost:3000
 4. **Generate**: Click "Generate Personalized Email"
 5. **Watch Live**: See research insights appear in real-time
 6. **Copy & Send**: Copy the generated email
-7. **Regenerate**: Get a new variation without re-researching
 
 ## API Endpoints
 
@@ -125,7 +123,6 @@ Open http://localhost:3000
 | POST | `/api/parse-resume` | Parse PDF/DOCX file |
 | POST | `/api/generate` | Start email generation |
 | GET | `/api/stream/:jobId` | SSE stream for updates |
-| POST | `/api/regenerate/:jobId` | Regenerate with cache |
 | POST | `/api/fetch-jd` | Fetch JD from URL |
 
 ## Tech Stack

@@ -16,7 +16,7 @@ import ResearchDepthSlider from "@/components/ResearchDepthSlider";
 import ResearchInsights from "@/components/ResearchInsights";
 import EmailOutput from "@/components/EmailOutput";
 import { useSSE } from "@/hooks/useSSE";
-import { startGeneration, getStreamUrl, getRegenerateUrl } from "@/lib/api";
+import { startGeneration, getStreamUrl } from "@/lib/api";
 
 export default function ColdReachApp() {
   // Form state
@@ -25,9 +25,6 @@ export default function ColdReachApp() {
   const [jobDescription, setJobDescription] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [researchDepth, setResearchDepth] = useState(2);
-
-  // Job tracking
-  const [currentJobId, setCurrentJobId] = useState<string | null>(null);
 
   // SSE hook for streaming
   const {
@@ -63,7 +60,6 @@ export default function ColdReachApp() {
         researchDepth,
       });
 
-      setCurrentJobId(response.jobId);
       const streamUrl = getStreamUrl(response.jobId, researchDepth);
       connect(streamUrl);
     } catch (err) {
@@ -78,14 +74,6 @@ export default function ColdReachApp() {
     reset,
     connect,
   ]);
-
-  // Handle regenerate (uses cached research)
-  const handleRegenerate = useCallback(() => {
-    if (!currentJobId) return;
-
-    const regenerateUrl = getRegenerateUrl(currentJobId);
-    connect(regenerateUrl);
-  }, [currentJobId, connect]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -197,7 +185,6 @@ export default function ColdReachApp() {
             <EmailOutput
               email={email}
               isLoading={isLoading}
-              onRegenerate={handleRegenerate}
             />
           </div>
         </div>

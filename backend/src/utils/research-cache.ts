@@ -1,16 +1,12 @@
-import type { ColdReachInsights, ColdReachResult } from "../agent/coldreach-agent.ts";
-
 interface CachedJob {
   jobId: string;
   resumeText: string;
   jdText: string;
   companyName?: string;
-  result?: ColdReachResult;
-  insights?: ColdReachInsights;
   createdAt: number;
 }
 
-// In-memory cache for job results (enables regenerate without re-research)
+// In-memory cache for job data
 const jobCache = new Map<string, CachedJob>();
 
 // Cache TTL: 1 hour
@@ -57,25 +53,6 @@ export function getJob(jobId: string): CachedJob | undefined {
 }
 
 /**
- * Update job with result and insights
- */
-export function updateJobResult(jobId: string, result: ColdReachResult): void {
-  const job = jobCache.get(jobId);
-  if (job) {
-    job.result = result;
-    job.insights = result.insights;
-  }
-}
-
-/**
- * Get cached insights for regeneration
- */
-export function getCachedInsights(jobId: string): ColdReachInsights | undefined {
-  const job = getJob(jobId);
-  return job?.insights;
-}
-
-/**
  * Clean up expired jobs (call periodically)
  */
 export function cleanupExpiredJobs(): number {
@@ -90,22 +67,4 @@ export function cleanupExpiredJobs(): number {
   }
 
   return cleaned;
-}
-
-/**
- * Get cache stats
- */
-export function getCacheStats(): { size: number; oldestJob: number | null } {
-  let oldestJob: number | null = null;
-
-  for (const job of jobCache.values()) {
-    if (oldestJob === null || job.createdAt < oldestJob) {
-      oldestJob = job.createdAt;
-    }
-  }
-
-  return {
-    size: jobCache.size,
-    oldestJob,
-  };
 }

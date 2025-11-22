@@ -85,8 +85,3 @@ export async function fetchJobDescription(url: string): Promise<FetchJDResponse>
 export function getStreamUrl(jobId: string, researchDepth: number): string {
   return `${API_BASE}/api/stream/${jobId}?depth=${researchDepth}`;
 }
-
-// Get regenerate stream URL
-export function getRegenerateUrl(jobId: string): string {
-  return `${API_BASE}/api/regenerate/${jobId}`;
-}
