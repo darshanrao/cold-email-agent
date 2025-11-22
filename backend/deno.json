@@ -1,0 +1,21 @@
+{
+  "name": "@coldreach/backend",
+  "version": "0.1.0",
+  "exports": "./src/server/main.ts",
+  "tasks": {
+    "dev": "deno run -A --watch src/server/main.ts",
+    "start": "deno run -A src/server/main.ts"
+  },
+  "imports": {
+    "@corespeed/zypher": "jsr:@corespeed/zypher",
+    "hono": "npm:hono@^4.6.0",
+    "rxjs-for-await": "npm:rxjs-for-await@^1.0.0",
+    "pdf-parse": "npm:pdf-parse@^1.1.1",
+    "mammoth": "npm:mammoth@^1.8.0",
+    "zod": "npm:zod@^3.23.0",
+    "@hono/node-server": "npm:@hono/node-server@^1.13.0"
+  },
+  "compilerOptions": {
+    "lib": ["deno.window", "dom"]
+  }
+}

@@ -1,0 +1,34 @@
+## OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+## Dependencies
+frontend/node_modules/
+node_modules/
+
+## Build / output
+dist/
+build/
+.next/
+out/
+
+## Deno
+.deno/
+deno.lock
+
+## Environment variables (keep secrets out of git)
+.env
+.env.*
+*.env
+
+# App-specific env files
+backend/.env
+frontend/.env
+frontend/.env.local
+
+## Zypher / MCP
+.zypher/
+
+
