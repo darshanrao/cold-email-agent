@@ -1,8 +1,0 @@
-[phases.setup]
-nixPkgs = ["deno"]
-
-[phases.install]
-cmds = ["deno cache src/server/main.ts"]
-
-[start]
-cmd = "deno run -A src/server/main.ts"
