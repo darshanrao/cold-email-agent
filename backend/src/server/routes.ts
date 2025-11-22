@@ -18,19 +18,67 @@ import {
 const app = new Hono();
 
 // Enable CORS for frontend
+// Get allowed origins from environment or use defaults
+const getAllowedOrigins = (): string[] => {
+  const envOrigins = Deno.env.get("ALLOWED_ORIGINS");
+  if (envOrigins) {
+    return envOrigins.split(",").map((o) => o.trim());
+  }
+  
+  // Default: allow localhost and all Vercel deployments
+  return [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+  ];
+};
+
+// Log CORS configuration on startup
+const corsConfig = getAllowedOrigins();
+const envOrigins = Deno.env.get("ALLOWED_ORIGINS");
+console.log(`[CORS] Configuration loaded:`);
+console.log(`[CORS] - Environment ALLOWED_ORIGINS: ${envOrigins || "not set (using defaults)"}`);
+console.log(`[CORS] - Allowed exact origins: ${corsConfig.join(", ") || "none"}`);
+console.log(`[CORS] - Also allowing: localhost, 127.0.0.1, *.vercel.app`);
+
 app.use(
   "*",
   cors({
     origin: (origin) => {
+      // Allow requests with no origin (e.g., mobile apps, Postman)
+      if (!origin) {
+        console.log("[CORS] Allowing request with no origin");
+        return "*";
+      }
+      
+      const allowedOrigins = getAllowedOrigins();
+      
+      // Check exact matches first
+      if (allowedOrigins.includes(origin)) {
+        console.log(`[CORS] Allowing origin (exact match): ${origin}`);
+        return origin;
+      }
+      
       // Allow localhost for development
-      if (!origin) return true;
-      if (origin.includes("localhost") || origin.includes("127.0.0.1")) return origin;
-      // Allow all Vercel deployments
-      if (origin.endsWith(".vercel.app")) return origin;
+      if (origin.includes("localhost") || origin.includes("127.0.0.1")) {
+        console.log(`[CORS] Allowing origin (localhost): ${origin}`);
+        return origin;
+      }
+      
+      // Allow all Vercel deployments (preview and production)
+      if (origin.endsWith(".vercel.app")) {
+        console.log(`[CORS] Allowing origin (Vercel): ${origin}`);
+        return origin;
+      }
+      
+      // Deny by default
+      console.log(`[CORS] Denying origin: ${origin}`);
       return null;
     },
     allowMethods: ["GET", "POST", "OPTIONS"],
     allowHeaders: ["Content-Type"],
+    credentials: false,
   })
 );
 
