@@ -9,6 +9,8 @@
   "imports": {
     "@corespeed/zypher": "jsr:@corespeed/zypher",
     "hono": "npm:hono@^4.6.0",
+    "hono/streaming": "npm:hono@^4.6.0/streaming",
+    "hono/cors": "npm:hono@^4.6.0/cors",
     "rxjs-for-await": "npm:rxjs-for-await@^1.0.0",
     "pdf-parse": "npm:pdf-parse@^1.1.1",
     "mammoth": "npm:mammoth@^1.8.0",
